@@ -89,6 +89,10 @@ const productSlice = createSlice({
         if (!exists) {
           state.items.unshift(action.payload);
         }
+      })
+      .addCase(createProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });

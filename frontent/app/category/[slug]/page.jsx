@@ -21,9 +21,9 @@ const ProductCard = memo(({ product, onAddToCart, adding }) => {
     <Card className="flex flex-col justify-between p-3">
       <CardHeader className="p-0 mb-2">
         <img
-          src={product.image}
+          src={product.imageUrl}
           alt={product.name}
-          className="w-full h-40 object-cover rounded"
+          className="w-full h-40 object-contain rounded"
         />
       </CardHeader>
       <CardContent className="p-0">
@@ -48,7 +48,7 @@ const CategoryProductsPage = () => {
   const { items, loading } = useSelector((state) => state.products);
   const [addingToCartId, setAddingToCartId] = useState(null);
 
-  //console.log(items.length);
+  console.log(items);
 
   useEffect(() => {
     dispatch(fetchProducts({ category: slug }));
