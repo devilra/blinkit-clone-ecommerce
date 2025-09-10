@@ -11,10 +11,7 @@ dotenv.config();
 const app = express();
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "https://blinkit-clone-ecommerce.vercel.app",
-    ], // frontend URL
+    origin: ["http://localhost:3000", "https://blinkit-clone-ecom.vercel.app"], // frontend URL
     credentials: true, // cookies/credentials allow
     methods: ["GET", "POST", "PUT", "DELETE"], // allowed methods
   })
