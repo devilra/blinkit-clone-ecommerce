@@ -152,3 +152,55 @@ exports.createProduct = async (req, res) => {
     res.status(500).json({ message: error });
   }
 };
+
+// @desc    Update product
+// @route   PUT /api/products/:id
+// @access  Admin
+
+exports.updateProduct = async (req, res) => {
+  try {
+    const { name, description, category, price, stock, unit, status } =
+      req.body;
+    const product = await Product.findById(req.params.id);
+
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    // Update basic fields
+    if (name) {
+      product.name = name;
+      product.slug = slugify(name, { lower: true });
+    }
+
+    if (description) product.description = description;
+    if (category) product.category = category;
+    if (price !== undefined) product.price = price;
+    if (stock !== undefined) product.stock = stock;
+    if (unit !== undefined) product.unit = unit;
+    if (sku !== undefined) product.sku = sku;
+    if (status !== undefined) product.status = status;
+
+    // 🔥 Main image update
+
+    if (req.files && req.files.image && req.files.image[0]) {
+      const newMainImage = await uploadToCloudinary(
+        req.files.image[0].buffer,
+        "products/main"
+      );
+      product.imageUrl = newMainImage;
+    }
+
+    // 🔥 Gallery update (replace existing gallery if new files uploaded)
+    if (req.files && req.files.gallery) {
+      let newGalleryUrls = [];
+      for (const file of req.files.gallery) {
+        const url = await uploadToCloudinary(file.buffer, "products/gallery");
+        newGalleryUrls.push(url);
+      }
+      product.gallery = newGalleryUrls; // overwrite old gallery
+    }
+    await product.save();
+    res.json({ message: "Product updated successfully", product });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};

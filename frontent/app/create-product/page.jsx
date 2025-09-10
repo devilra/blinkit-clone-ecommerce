@@ -27,9 +27,12 @@ const AdminProductCreate = () => {
     price: "",
     stock: "",
     unit: "",
+    status: "active", //default
   });
   const [image, setImage] = useState(null);
   const [gallery, setGallery] = useState([]);
+
+  // console.log(form.status);
 
   // console.log(form);
   // console.log(image);
@@ -143,6 +146,31 @@ const AdminProductCreate = () => {
             </SelectContent>
           </Select>
         </div>
+
+        {/* Status */}
+
+        <div className="space-y-1">
+          <Label htmlFor="status" className="py-1">
+            Status
+          </Label>
+          <Select
+            value={form.status || "active"} // default active
+            onValueChange={(val) =>
+              setForm((prev) => ({ ...prev, status: val }))
+            }
+          >
+            <SelectTrigger id="status">
+              <SelectValue placeholder="-- Select Status --" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="inactive">Inactive</SelectItem>
+              <SelectItem value="out-of-stock">Out of Stock</SelectItem>
+              <SelectItem value="archived">Archived</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         {/* Price */}
         <div className="space-y-1">
           <Label htmlFor="price">Price</Label>
