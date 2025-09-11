@@ -4,6 +4,8 @@ const {
   getProductById,
   createProduct,
   updateProduct,
+  addReview,
+  getTopProducts,
 } = require("../controllers/productController");
 const { protect } = require("../middleware/authMiddleware");
 const { admin } = require("../middleware/admin");
@@ -12,6 +14,7 @@ const router = express.Router();
 
 // Public
 router.get("/", getProducts);
+router.get("/top", getTopProducts);
 
 // Admin
 router.post(
@@ -27,6 +30,10 @@ router.post(
 
 // Public
 router.get("/:id", getProductById);
+
+// ✅ Private routes
+router.post("/:id/reviews", protect, addReview);
+
 // Admin - Update Product
 router.put(
   "/:id",

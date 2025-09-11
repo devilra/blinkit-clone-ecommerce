@@ -176,7 +176,7 @@ exports.updateProduct = async (req, res) => {
     if (price !== undefined) product.price = price;
     if (stock !== undefined) product.stock = stock;
     if (unit !== undefined) product.unit = unit;
-    if (sku !== undefined) product.sku = sku;
+    //if (sku !== undefined) product.sku = sku;
     if (status !== undefined) product.status = status;
 
     // 🔥 Main image update
@@ -200,6 +200,77 @@ exports.updateProduct = async (req, res) => {
     }
     await product.save();
     res.json({ message: "Product updated successfully", product });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// @desc    Delete product
+// @route   DELETE /api/products/:id
+// @access  Admin
+
+exports.deleteProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+    await product.deleteOne();
+    res.json({ message: "Product removed successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// @desc    Add review
+// @route   POST /api/products/:id/reviews
+// @access  Private
+
+exports.addReview = async (req, res) => {
+  try {
+    const { rating, comment } = req.body;
+    const product = await Product.findById(req.params.id);
+
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    const alreadyReviewed = product.reviews.find(
+      (rev) => rev.user.toString() === req.user._id.toString()
+    );
+
+    if (alreadyReviewed) {
+      return res.status(400).json({ message: "Product already reviewed" });
+    }
+
+    const review = {
+      user: req.user._id,
+      rating: Number(rating),
+      comment,
+    };
+
+    product.reviews.push(review);
+
+    product.reviewCount = product.reviews.length;
+    product.rating =
+      product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+      product.reviews.length;
+
+    await product.save();
+
+    res.status(201).json({ message: "Review added", review });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// @desc    Get top rated products
+// @route   GET /api/products/top
+// @access  Public
+
+exports.getTopProducts = async (req, res) => {
+  try {
+    const products = await Product.find({ status: "active" })
+      .sort({ rating: -1 })
+      .limit(5)
+      .populate("category", "name slug");
+    res.json(products);
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }

@@ -10,15 +10,22 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
+import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import React, { memo, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 // Product Card component (memoized)
 
 const ProductCard = memo(({ product, onAddToCart, adding }) => {
+  const router = useRouter();
+
   return (
-    <Card className="flex flex-col justify-between p-3">
+    <Card
+      onClick={() => router.push(`/products/${product._id}`)}
+      className="flex flex-col justify-between cursor-pointer hover:shadow-lg transition  p-3"
+    >
       <CardHeader className="p-0 mb-2">
         <img
           src={product.imageUrl}
