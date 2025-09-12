@@ -32,22 +32,30 @@ const getIdentifier = (req, res) => {
 
 exports.addToCart = async (req, res) => {
   try {
-    const { productId, quantity } = req.body;
-    const { userId, sessionId } = getIdentifier(req, res);
+    if (!req.user) {
+      return res
+        .status(401)
+        .json({ message: "Please login to add items to cart" });
+    }
 
-    console.log(productId, quantity);
+    const { productId, quantity } = req.body;
+    //const { userId, sessionId } = getIdentifier(req, res);
+
+    const userId = req.user._id;
+
+    //console.log(productId, quantity);
 
     // Product check
     const product = await Product.findById(productId);
     if (!product) return res.status(404).json({ message: "Product not found" });
 
     let cart = await Cart.findOne({
-      $or: [{ user: userId }, { sessionId }],
+      $or: [{ user: userId }],
       status: "active",
     });
 
     if (!cart) {
-      cart = new Cart({ user: userId, sessionId, items: [] });
+      cart = new Cart({ user: userId, items: [] });
     }
 
     // Check product already in cart
@@ -77,10 +85,16 @@ exports.addToCart = async (req, res) => {
 
 exports.getCart = async (req, res) => {
   try {
-    const { userId, sessionId } = getIdentifier(req, res);
+    //const { userId, sessionId } = getIdentifier(req, res);
+
+    if (!req.user) {
+      return res.status(401).json({ message: "Please login to view cart" });
+    }
+
+    const userId = req.user._id;
 
     const cart = await Cart.findOne({
-      $or: [{ user: userId }, { sessionId }],
+      $or: [{ user: userId }],
       status: "active",
     }).populate("items.product");
 
@@ -102,11 +116,16 @@ exports.getCart = async (req, res) => {
 
 exports.updateQuantity = async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Please login" });
+    }
     const { productId, quantity } = req.body;
-    const { userId, sessionId } = getIdentifier(req, res);
+    //const { userId, sessionId } = getIdentifier(req, res);
+
+    const userId = req.user._id;
 
     const cart = await Cart.findOne({
-      $or: [{ user: userId }, { sessionId }],
+      $or: [{ user: userId }],
       status: "active",
     });
 
@@ -129,11 +148,17 @@ exports.updateQuantity = async (req, res) => {
 
 exports.removeFromCart = async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Please login" });
+    }
+
     const { productId } = req.body;
-    const { userId, sessionId } = getIdentifier(req, res);
+    //const { userId, sessionId } = getIdentifier(req, res);
+
+    const userId = req.user._id;
 
     const cart = await Cart.findOne({
-      $or: [{ user: userId }, { sessionId }],
+      $or: [{ user: userId }],
       status: "active",
     });
 
@@ -153,10 +178,16 @@ exports.removeFromCart = async (req, res) => {
 
 exports.clearCart = async (req, res) => {
   try {
-    const { userId, sessionId } = getIdentifier(req, res);
+    if (!req.user) {
+      return res.status(401).json({ message: "Please login" });
+    }
+
+    //const { userId, sessionId } = getIdentifier(req, res);
+
+    const userId = req.user._id;
 
     let cart = await Cart.findOne({
-      $or: [{ user: userId }, { sessionId }],
+      $or: [{ user: userId }],
       status: "active",
     });
 
@@ -177,11 +208,16 @@ exports.clearCart = async (req, res) => {
 // @desc Increase item quantity
 exports.increaseQuantity = async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Please login" });
+    }
+
     const { productId } = req.body;
-    const { userId, sessionId } = getIdentifier(req, res);
+    const userId = req.user._id;
+    // const { userId, sessionId } = getIdentifier(req, res);
 
     const cart = await Cart.findOne({
-      $or: [{ user: userId }, { sessionId }],
+      $or: [{ user: userId }],
       status: "active",
     });
 
@@ -206,11 +242,17 @@ exports.increaseQuantity = async (req, res) => {
 
 exports.decreaseQuantity = async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Please login" });
+    }
+
     const { productId } = req.body;
-    const { userId, sessionId } = getIdentifier(req, res);
+    //const { userId, sessionId } = getIdentifier(req, res);
+
+    const userId = req.user._id;
 
     const cart = await Cart.findOne({
-      $or: [{ user: userId }, { sessionId }],
+      $or: [{ user: userId }],
       status: "active",
     });
 

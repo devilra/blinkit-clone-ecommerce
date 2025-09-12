@@ -100,13 +100,7 @@ export default function Navbar() {
                 <span className="absolute -top-2 -left-1  bg-red-600 text-white p-1 text-[9px] w-[17px] border-2  border-white h-[17px] flex items-center justify-center rounded-full">
                   {items.length}
                 </span>
-              ) : (
-                <>
-                  <Skeleton className="absolute opacity-65 -top-2 -left-1 h-[30px] w-[100px] rounded-full" />
-                  <Skeleton className="absolute opacity-65 -top-2 -left-1 h-[30px] w-[100px] rounded-full" />
-                  <Skeleton className="absolute opacity-65 -top-2 -left-1 h-[30px] w-[100px] rounded-full" />
-                </>
-              )}
+              ) : null}
 
               <span className={` text-sm`}>Cart</span>
             </Link>

@@ -8,29 +8,30 @@ const {
   increaseQuantity,
   decreaseQuantity,
 } = require("../controllers/cartController");
+const { protect } = require("../middleware/authMiddleware");
 const router = express.Router();
 
 // Cart Routes (guest also allowed)
 
 // Add to cart
-router.post("/add", addToCart);
+router.post("/add", protect, addToCart);
 
 // Get cart
-router.get("/", getCart);
+router.get("/", protect, getCart);
 
 // Update quantity
-router.put("/update", updateQuantity);
+router.put("/update", protect, updateQuantity);
 
 //increase quantity
-router.put("/increase", increaseQuantity);
+router.put("/increase", protect, increaseQuantity);
 
 //decrease quantity
-router.put("/decrease", decreaseQuantity);
+router.put("/decrease", protect, decreaseQuantity);
 
 // Remove item
-router.delete("/remove", removeFromCart);
+router.delete("/remove", protect, removeFromCart);
 
 // Clear cart
-router.delete("/clear", clearCart);
+router.delete("/clear", protect, clearCart);
 
 module.exports = router;

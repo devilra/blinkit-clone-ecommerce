@@ -10,10 +10,14 @@ import axios from "axios";
 import API from "../api";
 
 const Home = () => {
-  //const dispatch = useDispatch();
+  const dispatch = useDispatch();
   // useEffect(() => {
   //   dispatch(getMe());
   // }, []);
+
+  // useEffect(() => {
+  //   dispatch(fetchCart());
+  // }, [dispatch]);
 
   return (
     <div className="bg-gradient-to-l from-amber-50 md:mt-20 h-full">
