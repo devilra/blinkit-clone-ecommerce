@@ -59,7 +59,7 @@ const productSlice = createSlice({
     page: 1,
     pages: 1,
     total: 0,
-    loading: false,
+    loading: true,
     error: null,
     success: false,
   },

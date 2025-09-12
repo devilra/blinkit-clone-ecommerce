@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 const adminRoutes = require("./routes/adminRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const productRoutes = require("./routes/productRoutes");
+const cartRoutes = require("./routes/cartRoutes");
 
 dotenv.config();
 const app = express();
@@ -29,6 +30,7 @@ app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/admin", adminRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/cart", cartRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

@@ -1,5 +1,6 @@
 "use client";
 
+import { fetchCart } from "@/app/redux/slices/cartSlice";
 import { fetchCategories } from "@/app/redux/slices/categorySlice";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";

@@ -11,14 +11,24 @@ import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { MdOutlineTimer } from "react-icons/md";
+import { FaPlus } from "react-icons/fa";
+import { FaMinus } from "react-icons/fa";
+import Btn from "@mui/material/Button";
 
 import { toast } from "react-toastify";
+import {
+  addToCart,
+  decreaseQuantity,
+  fetchCart,
+  increaseQuantity,
+} from "@/app/redux/slices/cartSlice";
 
 const ProductDetailsPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   //  State for main image
   const [mainImage, setMainImage] = useState(null);
+  const { items } = useSelector((state) => state.cart);
 
   const [time, setTime] = useState(0);
   const [newPrice, setNewPrice] = useState(0);
@@ -29,6 +39,8 @@ const ProductDetailsPage = () => {
     loading,
     error,
   } = useSelector((state) => state.products);
+
+  const [incDecLoading, setIncDecLoading] = useState(null);
 
   useEffect(() => {
     if (id) dispatch(fetchProductById(id));
@@ -48,6 +60,36 @@ const ProductDetailsPage = () => {
       setNewPrice(product.price - discount);
     }
   }, [product]);
+
+  const cartItem = items.find((i) => i.product._id === id);
+
+  const handleIncrease = (productId) => {
+    setIncDecLoading({ id: productId, type: "increase" });
+    dispatch(increaseQuantity(productId))
+      .then(() => dispatch(fetchCart()))
+      .finally(() => setIncDecLoading(null));
+  };
+
+  const handleDecrease = (productId) => {
+    setIncDecLoading({ id: productId, type: "decrease" });
+    dispatch(decreaseQuantity(productId))
+      .then(() => dispatch(fetchCart()))
+      .finally(() => setIncDecLoading(null));
+  };
+
+  const handleAddToCart = (productId) => {
+    console.log(productId);
+    try {
+      //setAddingToCartId(productId); // loader start
+      dispatch(addToCart({ productId, quantity: 1 })).then(() =>
+        dispatch(fetchCart())
+      );
+      // setAddingToCartId(null); // loader end
+    } catch (error) {
+      toast.error(error);
+      //setAddingToCartId(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -177,9 +219,45 @@ const ProductDetailsPage = () => {
             <p className="text-sm bg-slate-200 rounded max-w-[110px] my-7  px-2 py-2">
               Stock: {product.stock} {product.unit}
             </p>
-            <Button size="lg" className="w-full md:w-auto">
-              Add to Cart
-            </Button>
+
+            {/*  Add to Cart / Increase-Decrease */}
+            {!cartItem ? (
+              <Button
+                size="lg"
+                className="w-full md:w-auto cursor-pointer"
+                onClick={() => handleAddToCart(product._id)}
+              >
+                Add to Cart
+              </Button>
+            ) : (
+              <div className="flex items-center gap-3 md:gap-10">
+                <Btn
+                  variant="outlined"
+                  color="error"
+                  sx={{ padding: "10px 0px" }}
+                  loading={
+                    incDecLoading?.id === product._id &&
+                    incDecLoading?.type === "decrease"
+                  }
+                  onClick={() => handleDecrease(product._id)}
+                >
+                  <FaMinus />
+                </Btn>
+                <span className="font-medium">{cartItem.quantity}</span>
+                <Btn
+                  variant="outlined"
+                  color="success"
+                  sx={{ padding: "10px 0px" }}
+                  loading={
+                    incDecLoading?.id === product._id &&
+                    incDecLoading?.type === "increase"
+                  }
+                  onClick={() => handleIncrease(product._id)}
+                >
+                  <FaPlus />
+                </Btn>
+              </div>
+            )}
 
             {/* Why Shop Section */}
             <div className="pt-5 md:pt-10 space-y-3">
