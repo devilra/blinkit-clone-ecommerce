@@ -17,6 +17,8 @@ import { fetchAddresses } from "../redux/slices/addressSlice";
 import { IoCallSharp } from "react-icons/io5";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { ShinyButton } from "@/components/magicui/shiny-button";
+import { RainbowButton } from "@/components/magicui/rainbow-button";
 
 const CheckoutDrawer = () => {
   const dispatch = useDispatch();
@@ -155,6 +157,15 @@ const CheckoutDrawer = () => {
               </div>
             </div>
           </div>
+
+          <DrawerFooter className="">
+            <div className="flex justify-end  ">
+              {/* <RainbowButton className="md:w-[200px]">Checkout</RainbowButton> */}
+              <ShinyButton className="md:w-[200px] border border-neutral-700 rounded font-bold ">
+                Checkout
+              </ShinyButton>
+            </div>
+          </DrawerFooter>
         </DrawerContent>
       </Drawer>
     </div>
