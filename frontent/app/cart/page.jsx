@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  clearCart,
   decreaseQuantity,
   fetchCart,
   increaseQuantity,
@@ -14,9 +15,14 @@ import { Button } from "@mui/material";
 import { FaMinus, FaPlus } from "react-icons/fa";
 import { FaTrash } from "react-icons/fa";
 import { Separator } from "@/components/ui/separator";
+import { PiTrashSimpleThin } from "react-icons/pi";
+import { useRouter } from "next/navigation";
+import { fetchAddresses } from "../redux/slices/addressSlice";
+import CheckoutDrawer from "../Components/CheckoutDrawer";
 
 const CartPage = () => {
   const dispatch = useDispatch();
+  const router = useRouter();
 
   const { items, totalPrice, loading, updating } = useSelector(
     (state) => state.cart
@@ -28,6 +34,7 @@ const CartPage = () => {
 
   useEffect(() => {
     dispatch(fetchCart());
+    dispatch(fetchAddresses());
   }, []);
 
   const handleRemove = (productId) => {
@@ -49,9 +56,27 @@ const CartPage = () => {
     }
   };
 
+  const handleClearCart = () => {
+    dispatch(clearCart());
+  };
+
   return (
     <div className=" md:mt-20  flex flex-col md:flex-row gap-6 min">
-      <div className="flex-1 bg-white rounded-lg shadow-md p-4">
+      <div className="flex-1 bg-white rounded-lg shadow-md p-4 ">
+        {items.length > 0 && (
+          <div className="sticky bottom-1 right-1 z-10 bg-white py-2 flex justify-end border-b">
+            <Button
+              variant="outlined"
+              color="error"
+              size="small"
+              startIcon={<PiTrashSimpleThin />}
+              onClick={handleClearCart}
+            >
+              Clear Cart
+            </Button>
+          </div>
+        )}
+
         {loading ? (
           <>
             {[1, 2, 3].map((n) => (
@@ -69,10 +94,19 @@ const CartPage = () => {
             ))}
           </>
         ) : items.length === 0 ? ( //  Empty cart only after loading false
-          <p className="text-gray-600 text-center">Your cart is empty</p>
+          <div className="flex flex-col items-center justify-center h-[83vh]">
+            <p className="text-gray-600 mb-4">Your cart is empty</p>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => router.push("/")} // or `/`
+            >
+              GO TO SHOPPING
+            </Button>
+          </div>
         ) : (
           items.map((item, idx) => {
-            console.log(item);
+            //console.log(item);
             return (
               <div
                 key={idx}
@@ -169,76 +203,82 @@ const CartPage = () => {
       </div>
 
       {/* Right side - Price Details */}
-      <div className="w-full md:w-1/3 bg-white h-screen rounded-lg shadow-md p-4">
-        {loading ? (
-          <>
-            {" "}
-            <Skeleton className="h-5 w-1/3 mb-4" />
-            <Skeleton className="h-4 w-full mb-2" />
-            <Skeleton className="h-4 w-2/3 mb-2" />
-            <Skeleton className="h-4 w-1/2 mb-2" />
-            <Skeleton className="h-10 w-full mt-4 rounded" />
-          </>
-        ) : (
-          <>
-            <h2 className="font-semibold border-b pb-2 mb-2">PRICE DETAILS</h2>
+      {items.length > 0 ? (
+        <div className="w-full md:w-1/3 bg-white h-screen rounded-lg shadow-md p-4">
+          {loading ? (
+            <>
+              {" "}
+              <Skeleton className="h-5 w-1/3 mb-4" />
+              <Skeleton className="h-4 w-full mb-2" />
+              <Skeleton className="h-4 w-2/3 mb-2" />
+              <Skeleton className="h-4 w-1/2 mb-2" />
+              <Skeleton className="h-10 w-full mt-4 rounded" />
+            </>
+          ) : (
+            <>
+              <h2 className="font-semibold border-b pb-2 mb-2">
+                PRICE DETAILS
+              </h2>
 
-            {/* 🔥 Each item calculation */}
+              {/* 🔥 Each item calculation */}
 
-            <ul className="mb-4 list-disc space-y-3 md:space-y-5 mt-5">
-              {items.map((item, i) => {
-                const unitPrice =
-                  item.product.discountPrice || item.product.price;
-                return (
-                  <div key={i}>
-                    <li className="flex justify-between py-1">
-                      <span className="text-[12px] text-neutral-600">
-                        {item.product.name} ({item.quantity} × ₹{unitPrice})
-                      </span>
-                      <span className="text-[12px] text-neutral-600">
-                        ₹{unitPrice * item.quantity}
-                      </span>
-                    </li>
-                    <Separator />
-                  </div>
-                );
-              })}
-            </ul>
+              <ul className="mb-4 list-disc space-y-3 md:space-y-5 mt-5">
+                {items.map((item, i) => {
+                  const unitPrice =
+                    item.product.discountPrice || item.product.price;
+                  return (
+                    <div key={i}>
+                      <li className="flex justify-between py-1">
+                        <span className="text-[12px] text-neutral-600">
+                          {item.product.name} ({item.quantity} × ₹{unitPrice})
+                        </span>
+                        <span className="text-[12px] text-neutral-600">
+                          ₹{unitPrice * item.quantity}
+                        </span>
+                      </li>
+                      <Separator />
+                    </div>
+                  );
+                })}
+              </ul>
 
-            <div className="flex justify-between mb-2 font-medium">
-              <span> ({items.length} items)</span>
-              <span>₹{totalPrice}</span>
-            </div>
+              <div className="flex justify-between mb-2 font-medium">
+                <span> ({items.length} items)</span>
+                <span>₹{totalPrice}</span>
+              </div>
 
-            <div className="flex justify-between mb-2 text-green-600">
-              <span>Discount</span>
-              <span>-₹{Math.round(totalPrice * 0.2)}</span>
-            </div>
+              <div className="flex justify-between mb-2 text-green-600">
+                <span>Discount</span>
+                <span>-₹{Math.round(totalPrice * 0.2)}</span>
+              </div>
 
-            <div className="flex justify-between mb-2">
-              <span>Delivery Charges</span>
-              <span className="text-green-600">FREE</span>
-            </div>
+              <div className="flex justify-between mb-2">
+                <span>Delivery Charges</span>
+                <span className="text-green-600">FREE</span>
+              </div>
 
-            <div className="flex justify-between font-semibold border-t pt-2">
-              <span>Total Amount</span>
-              <span>₹{totalPrice - Math.round(totalPrice * 0.2)}</span>
-            </div>
+              <div className="flex justify-between font-semibold border-t pt-2">
+                <span>Total Amount</span>
+                <span>₹{totalPrice - Math.round(totalPrice * 0.2)}</span>
+              </div>
 
-            <p className="text-green-600 text-sm mt-2">
-              You will save ₹{Math.round(totalPrice * 0.2)} on this order
-            </p>
+              <p className="text-green-600 text-sm mt-2">
+                You will save ₹{Math.round(totalPrice * 0.2)} on this order
+              </p>
 
-            <Button
-              variant="contained"
-              sx={{ marginTop: "10px" }}
-              color="success"
-              className="w-full "
-            >
-              PLACE ORDER
-            </Button>
+              {/* <Button
+                variant="contained"
+                sx={{ marginTop: "10px" }}
+                color="success"
+                className="w-full "
+                disabled={items.length === 0}
+              >
+                PLACE ORDER
+              </Button> */}
 
-            {/* <div className="flex justify-between mb-2">
+              <CheckoutDrawer />
+
+              {/* <div className="flex justify-between mb-2">
               <span>Price ({items.length} items)</span>
             </div>
             <div className="flex justify-between mb-2 text-green-600">
@@ -263,9 +303,10 @@ const CartPage = () => {
             >
               PLACE ORDER
             </Button> */}
-          </>
-        )}
-      </div>
+            </>
+          )}
+        </div>
+      ) : null}
     </div>
   );
 };

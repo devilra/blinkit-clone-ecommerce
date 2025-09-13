@@ -114,8 +114,16 @@ const ProductCard = memo(
                 e.stopPropagation();
                 onAddToCart(product._id);
               }}
+              disabled={adding}
             >
-              "Add to Cart"
+              {adding ? (
+                <div className="flex items-center justify-center gap-2">
+                  <Loader2Icon className="animate-spin w-4 h-4" />
+                  Adding...
+                </div>
+              ) : (
+                "Add to Cart"
+              )}
             </Button>
           )}
         </CardFooter>
@@ -132,6 +140,7 @@ const CategoryProductsPage = () => {
   );
   const [addingToCartId, setAddingToCartId] = useState(null);
   const [incDecLoading, setInDecLoading] = useState(null);
+
   const {
     items: cartItems,
     inc_dec,
@@ -149,16 +158,17 @@ const CategoryProductsPage = () => {
 
   const handleAddToCart = (productId) => {
     console.log(productId);
-    try {
-      setAddingToCartId(productId); // loader start
-      dispatch(addToCart({ productId, quantity: 1 })).then(() =>
-        dispatch(fetchCart())
-      );
-      setAddingToCartId(null); // loader end
-    } catch (error) {
-      toast.error(error);
-      setAddingToCartId(null);
-    }
+
+    setAddingToCartId(productId); // loader start
+    dispatch(addToCart({ productId, quantity: 1 }))
+      .then(() => dispatch(fetchCart()))
+      .catch((error) => {
+        toast.error(error);
+        setAddingToCartId(null);
+      })
+      .finally(() => {
+        setAddingToCartId(null); // loader end
+      });
   };
 
   const handleIncrease = (productId) => {
